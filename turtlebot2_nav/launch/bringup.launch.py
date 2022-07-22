@@ -94,14 +94,14 @@ def generate_launch_description():
                               'params_file': params_file,
                               'use_lifecycle_mgr': 'false'}.items()),
 
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource(os.path.join(launch_dir, 'navigation.launch.py')),
-        #     launch_arguments={'namespace': namespace,
-        #                       'use_sim_time': use_sim_time,
-        #                       'autostart': autostart,
-        #                       'params_file': params_file,
-        #                       'use_lifecycle_mgr': 'false',
-        #                       'map_subscribe_transient_local': 'true'}.items()),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(launch_dir, 'navigation.launch.py')),
+            launch_arguments={'namespace': namespace,
+                              'use_sim_time': use_sim_time,
+                              'autostart': autostart,
+                              'params_file': params_file,
+                              'use_lifecycle_mgr': 'false',
+                              'map_subscribe_transient_local': 'true'}.items()),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'rviz_view.launch.py')),
