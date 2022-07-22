@@ -31,9 +31,8 @@ def generate_launch_description():
             package='robot_localization',
             executable='ekf_node',
             output='screen',
-            parameters=[ekf_config_params]
-            # ,
-            # remappings=[("odometry/filtered", "odom")]
+            parameters=[ekf_config_params],
+            remappings=[("odometry/filtered", "odom")]
         )
 
     urg_node = launch.actions.IncludeLaunchDescription(
@@ -66,14 +65,7 @@ def generate_launch_description():
         arguments=['-d',os.path.join(turtlebot2_bringup_package,'rviz/bringup.rviz')],
         condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration("open_rviz")) 
     )
-    
-    # mapping_launch = launch.actions.IncludeLaunchDescription(
-    #     launch.launch_description_sources.PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             slam_toolbox_package,
-    #             'launch/online_async_launch.py')
-    #     )
-    # )
+
 
     return launch.LaunchDescription([
         launch.actions.DeclareLaunchArgument(

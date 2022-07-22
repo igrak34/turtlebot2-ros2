@@ -16,7 +16,11 @@ def generate_launch_description():
     urg_package = launch_ros.substitutions.FindPackageShare(package='urg_node').find('urg_node')
     turtlebot2_description_package = launch_ros.substitutions.FindPackageShare(package='turtlebot2_description').find('turtlebot2_description')
     turtlebot2_slam_package = launch_ros.substitutions.FindPackageShare(package='turtlebot2_slam').find('turtlebot2_slam')
+    turtlebot2_bringup_package = launch_ros.substitutions.FindPackageShare(package='turtlebot2_bringup').find('turtlebot2_bringup')
     slam_toolbox_package = launch_ros.substitutions.FindPackageShare(package='slam_toolbox').find('slam_toolbox')
+
+    
+    ekf_config_params = os.path.join(turtlebot2_bringup_package,'config/ekf_config.yaml')
 
     kobuki_node_launch = launch.actions.IncludeLaunchDescription(
         launch.launch_description_sources.PythonLaunchDescriptionSource(
@@ -26,6 +30,14 @@ def generate_launch_description():
         )
     )
 
+    ekf_node = launch_ros.actions.Node(
+            package='robot_localization',
+            executable='ekf_node',
+            output='screen',
+            parameters=[ekf_config_params]
+            # ,
+            # remappings=[("odometry/filtered", "odom")]
+        )
     urg_node = launch.actions.IncludeLaunchDescription(
         launch.launch_description_sources.PythonLaunchDescriptionSource(
             os.path.join(
@@ -74,5 +86,6 @@ def generate_launch_description():
         robot_state_publisher_node,
         joint_state_publisher_node,
         rviz_node,
-        mapping_launch
+        mapping_launch,
+        ekf_node
     ])
