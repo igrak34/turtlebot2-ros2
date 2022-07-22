@@ -57,14 +57,14 @@ def generate_launch_description():
         name='joint_state_publisher'
     )
 
-    rviz_node = launch_ros.actions.Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        output='screen',
-        arguments=['-d',os.path.join(turtlebot2_bringup_package,'rviz/bringup.rviz')],
-        condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration("open_rviz")) 
-    )
+    # rviz_node = launch_ros.actions.Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    #     output='screen',
+    #     arguments=['-d',os.path.join(turtlebot2_bringup_package,'rviz/bringup.rviz')],
+    #     condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration("open_rviz")) 
+    # )
 
 
     return launch.LaunchDescription([
@@ -76,6 +76,6 @@ def generate_launch_description():
         urg_node,
         robot_state_publisher_node,
         joint_state_publisher_node,
-        rviz_node,
-        ekf_node
+        # rviz_node,
+        # ekf_node
     ])
