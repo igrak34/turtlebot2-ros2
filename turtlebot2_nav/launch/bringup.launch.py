@@ -18,7 +18,7 @@ def generate_launch_description():
     # Get the launch directory
     nav_dir = get_package_share_directory('turtlebot2_nav')
     launch_dir = os.path.join(nav_dir, 'launch')
-    config_dir = os.path.join(nav_dir, 'config')
+    config_dir = os.path.join(nav_dir, 'param')
     param_file = 'turtlebot2_params.yaml'
     map_dir = os.path.join(nav_dir, 'maps')
     map_file = 'lab07.yaml'

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="sensor_hokuyo" xmlns:xacro="http://ros.org/wiki/xacro">
-    <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro" />
-    <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro" />
+    <xacro:include filename="$(find turtlebot2_description)/urdf/turtlebot_gazebo.urdf.xacro" />
+    <xacro:include filename="$(find turtlebot2_description)/urdf/turtlebot_properties.urdf.xacro" />
 
     <xacro:property name="laser_px" value="0.1" />
     <xacro:property name="laser_py" value="0" />
