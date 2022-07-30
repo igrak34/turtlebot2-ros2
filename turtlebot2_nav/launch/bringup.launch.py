@@ -20,7 +20,7 @@ def generate_launch_description():
     launch_dir = os.path.join(nav_dir, 'launch')
     config_dir = os.path.join(nav_dir, 'param')
     param_file = 'turtlebot2_params.yaml'
-    map_dir = os.path.join(nav_dir, 'maps')
+    map_dir = os.path.join(nav_dir, 'map')
     map_file = 'lab07.yaml'
 
     turtlebot2_bringup_package=get_package_share_directory('turtlebot2_bringup')
