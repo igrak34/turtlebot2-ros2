@@ -22,39 +22,59 @@ def generate_launch_description():
     gazebo_ros_package = FindPackageShare(
         package="gazebo_ros").find("gazebo_ros")
 
+    kobuki_description_package = FindPackageShare(
+        package="kobuki_description").find("kobuki_description")
+
     world = os.path.join(
         tutlebot2_gazebo_package, "worlds", "test.world.model"
     )
 
-    # install_dir = get_package_prefix(turtlebot2_description_package)
-    # gazebo_models_path = os.path.join(tutlebot2_gazebo_package, "models")
+    install_dir1 = get_package_prefix("turtlebot2_description")
+    install_dir2 = get_package_prefix("kobuki_description")
+    gazebo_models_path1 = os.path.join(
+        turtlebot2_description_package, "meshes")
+    gazebo_models_path2 = os.path.join(kobuki_description_package, "meshes")
 
-    # # x_pose = LaunchConfiguration("x_pose", default="0.0")
-    # # y_pose = LaunchConfiguration("y_pose", default="0.0")
+    # x_pose = LaunchConfiguration("x_pose", default="0.0")
+    # y_pose = LaunchConfiguration("y_pose", default="0.0")
 
-    # if "GAZEBO_MODEL_PATH" in os.environ:
-    #     os.environ["GAZEBO_MODEL_PATH"] = (
-    #         os.environ["GAZEBO_MODEL_PATH"]
-    #         + ":"
-    #         + install_dir
-    #         + "/share"
-    #         + ":"
-    #         + gazebo_models_path
-    #     )
-    # else:
-    #     os.environ["GAZEBO_MODEL_PATH"] = (
-    #         install_dir + "/share" + ":" + gazebo_models_path
-    #     )
+    if "GAZEBO_MODEL_PATH" in os.environ:
+        os.environ["GAZEBO_MODEL_PATH"] = (
+            os.environ["GAZEBO_MODEL_PATH"]
+            + ":"
+            + install_dir2
+            + "/share"
+            + ":"
+            + gazebo_models_path2
+        )
+    else:
+        os.environ["GAZEBO_MODEL_PATH"] = (
+            install_dir2 + "/share" + ":" + gazebo_models_path2
+        )
 
-    # if "GAZEBO_PLUGIN_PATH" in os.environ:
-    #     os.environ["GAZEBO_PLUGIN_PATH"] = (
-    #         os.environ["GAZEBO_PLUGIN_PATH"] + ":" + install_dir + "/lib"
-    #     )
-    # else:
-    #     os.environ["GAZEBO_PLUGIN_PATH"] = install_dir + "/lib"
+    if "GAZEBO_MODEL_PATH" in os.environ:
+        os.environ["GAZEBO_MODEL_PATH"] = (
+            os.environ["GAZEBO_MODEL_PATH"]
+            + ":"
+            + install_dir1
+            + "/share"
+            + ":"
+            + gazebo_models_path1
+        )
+    else:
+        os.environ["GAZEBO_MODEL_PATH"] = (
+            install_dir1 + "/share" + ":" + gazebo_models_path1
+        )
 
-    # print("GAZEBO MODELS PATH==" + str(os.environ["GAZEBO_MODEL_PATH"]))
-    # print("GAZEBO PLUGINS PATH==" + str(os.environ["GAZEBO_PLUGIN_PATH"]))
+    if "GAZEBO_PLUGIN_PATH" in os.environ:
+        os.environ["GAZEBO_PLUGIN_PATH"] = (
+            os.environ["GAZEBO_PLUGIN_PATH"] + ":" + install_dir1 + "/lib"
+        )
+    else:
+        os.environ["GAZEBO_PLUGIN_PATH"] = install_dir1 + "/lib"
+
+    print("GAZEBO MODELS PATH==" + str(os.environ["GAZEBO_MODEL_PATH"]))
+    print("GAZEBO PLUGINS PATH==" + str(os.environ["GAZEBO_PLUGIN_PATH"]))
 
     # ============================================================
     gazebo = IncludeLaunchDescription(
@@ -91,10 +111,10 @@ def generate_launch_description():
         output="screen",
         arguments=[
             "-entity",
-            "two_wheeled_robot",
+            "turtlebot2",
             # '-timeout','300',
             "-file",
-            os.path.join(turtlebot2_description_package,"robots","tmp.urdf"),
+            os.path.join(turtlebot2_description_package, "robots", "tmp.urdf"),
             "-x",
             "0",
             "-y",

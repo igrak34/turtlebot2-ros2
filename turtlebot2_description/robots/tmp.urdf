@@ -40,11 +40,11 @@
   </joint>
   <link name="base_link">
     <visual>
+      <origin rpy="0 0 0" xyz="0.001 0 0.05199"/>
       <geometry>
         <!-- new mesh -->
         <mesh filename="package://kobuki_description/meshes/main_body.dae"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.001 0 0.05199"/>
     </visual>
     <collision name="base">
       <geometry>
