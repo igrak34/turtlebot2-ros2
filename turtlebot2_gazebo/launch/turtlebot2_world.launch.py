@@ -13,7 +13,9 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
 
-    tutlebot2_gazebo_package = FindPackageShare(
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+
+    turtlebot2_gazebo_package = FindPackageShare(
         package="turtlebot2_gazebo").find("turtlebot2_gazebo")
 
     turtlebot2_description_package = FindPackageShare(
@@ -25,18 +27,14 @@ def generate_launch_description():
     kobuki_description_package = FindPackageShare(
         package="kobuki_description").find("kobuki_description")
 
-    world = os.path.join(
-        tutlebot2_gazebo_package, "worlds", "test.world.model"
-    )
+    slam_toolbox_package = FindPackageShare(
+        package="slam_toolbox").find("slam_toolbox")
 
     install_dir1 = get_package_prefix("turtlebot2_description")
     install_dir2 = get_package_prefix("kobuki_description")
     gazebo_models_path1 = os.path.join(
         turtlebot2_description_package, "meshes")
     gazebo_models_path2 = os.path.join(kobuki_description_package, "meshes")
-
-    # x_pose = LaunchConfiguration("x_pose", default="0.0")
-    # y_pose = LaunchConfiguration("y_pose", default="0.0")
 
     if "GAZEBO_MODEL_PATH" in os.environ:
         os.environ["GAZEBO_MODEL_PATH"] = (
@@ -83,8 +81,6 @@ def generate_launch_description():
         )
     )
 
-    # start_gazebo_client_cmd = ExecuteProcess(cmd=["gzclient"], output="screen")
-
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -104,6 +100,13 @@ def generate_launch_description():
         ],
     )
 
+    joint_state_publisher_node = Node(      # ???
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        parameters=[{"use_sim_time": True}]
+    )
+
     spawn_tb2 = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
@@ -112,9 +115,8 @@ def generate_launch_description():
         arguments=[
             "-entity",
             "turtlebot2",
-            # '-timeout','300',
-            "-file",
-            os.path.join(turtlebot2_description_package, "robots", "tmp.urdf"),
+            "-topic",
+            "/robot_description",
             "-x",
             "0",
             "-y",
@@ -122,14 +124,39 @@ def generate_launch_description():
         ],
     )
 
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=[
+            '-d', os.path.join(turtlebot2_gazebo_package, 'rviz/map.rviz')]
+    )
+
+    mapping_launch=Node(
+        parameters=[
+            {'use_sim_time': use_sim_time},
+            {get_package_share_directory("turtlebot2_gazebo") + '/config/slam_toolbox_params.yaml'}
+        ],
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen'
+    )
+
     ld = LaunchDescription([
         DeclareLaunchArgument(
             'world',
             default_value=[os.path.join(
-                tutlebot2_gazebo_package, 'worlds', 'test.world.model'), ''],
+                turtlebot2_gazebo_package, 'worlds', 'test.world.model'), ''],
             description='SDF world file')])
+
     ld.add_action(gazebo)
     ld.add_action(robot_state_publisher_node)
+    # ld.add_action(joint_state_publisher_node)
     ld.add_action(spawn_tb2)
+    ld.add_action(rviz_node)
+    ld.add_action(mapping_launch)
 
     return ld
