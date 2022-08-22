@@ -7,33 +7,35 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from nav2_common.launch import ReplaceString
 
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-
     map_dir = LaunchConfiguration(
         'map',
         default=os.path.join(
             get_package_share_directory('turtlebot2_gazebo'),
             'maps',
             'map_1661002108.yaml'))
-
     param_dir = LaunchConfiguration(
         'params_file',
         default=os.path.join(
             get_package_share_directory('turtlebot2_gazebo'),
             'config',
             'nav2_params.yaml'))
+    
+    namespace = LaunchConfiguration('namespace')
+    use_namespace = LaunchConfiguration('use_namespace')
+    rviz_config_file = LaunchConfiguration('rviz_config')
 
-    nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
+    nav2_launch_file_dir = os.path.join(
+        get_package_share_directory('nav2_bringup'), 'launch')
 
-    rviz_config_dir = os.path.join(
-        get_package_share_directory('nav2_bringup'),
-        'rviz',
-        'nav2_default_view.rviz')
+    turtlebot2_gazebo_dir = get_package_share_directory('turtlebot2_gazebo')
 
-    turtlebot2_gazebo_dir = os.path.join(get_package_share_directory('turtlebot2_gazebo'),'launch','turtlebot2_world.launch.py')
+    turtlebot2_world_launch = os.path.join(get_package_share_directory(
+        'turtlebot2_gazebo'), 'launch', 'turtlebot2_world.launch.py')
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -53,20 +55,27 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             'namespace',
-            default_value='',
+            default_value='tb2',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(
             'use_namespace',
-            default_value='false',
+            default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
-        
+
+        DeclareLaunchArgument(
+            'rviz_config',
+            default_value=os.path.join(
+                turtlebot2_gazebo_dir, 'rviz', 'namespaced_nav2.rviz'),
+            description='Full path to the RVIZ config file to use'),
+
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([turtlebot2_gazebo_dir])
+            PythonLaunchDescriptionSource([turtlebot2_world_launch])
         ),
-        
+
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
+            PythonLaunchDescriptionSource(
+                [nav2_launch_file_dir, '/bringup_launch.py']),
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
@@ -76,8 +85,13 @@ def generate_launch_description():
         Node(
             package='rviz2',
             executable='rviz2',
-            name='rviz2',
-            arguments=['-d', rviz_config_dir],
-            parameters=[{'use_sim_time': use_sim_time}],
-            output='screen'),
+            namespace=namespace,
+            arguments=['-d', rviz_config_file],
+            output='screen',
+            parameters=[{'use_sim_time':use_sim_time}],
+            remappings=[('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
+                        ('/goal_pose', 'goal_pose'),
+                        ('/clicked_point', 'clicked_point'),
+                        ('/initialpose', 'initialpose')]),
     ])

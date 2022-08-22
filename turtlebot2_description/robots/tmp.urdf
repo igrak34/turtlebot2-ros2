@@ -348,6 +348,8 @@
       <plugin filename="libgazebo_ros_imu_sensor.so" name="gazebo_ros_imu_controller">
         <ros>
           <argument>~/out:=imu</argument>
+          <!-- TODO! AUTOMATIC NAMESPACE -->
+          <namespace>tb2</namespace>
         </ros>
         <output_type>sensor_msgs/msg/Imu</output_type>
         <body_name>gyro_link</body_name>
@@ -386,6 +388,12 @@
       <wheel_diameter>0.070</wheel_diameter>
       <max_wheel_torque>1.0</max_wheel_torque>
       <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <!-- TODO! AUTOMATIC NAMESPACE -->
+      <ros>
+        <namespace>/tb2</namespace>
+        <remapping>/tf:=tf</remapping>
+      </ros>
+      <robotNamespace>tb2</robotNamespace>
       <command_topic>cmd_vel</command_topic>
       <!-- output -->
       <publish_odom>true</publish_odom>
@@ -394,6 +402,10 @@
       <odometry_topic>odom</odometry_topic>
       <odometry_frame>odom</odometry_frame>
       <robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+    <plugin filename="libgazebo_ros_joint_state_publisher.so" name="joint_states">
+      <joint_name>wheel_left_joint</joint_name>
+      <joint_name>wheel_right_joint</joint_name>
     </plugin>
   </gazebo>
   <joint name="pole_bottom_0_joint" type="fixed">
@@ -908,6 +920,8 @@
       <plugin filename="libgazebo_ros_ray_sensor.so" name="turtlebot2_laserscan">
         <ros>
           <remapping>~/out:=scan</remapping>
+          <!-- TODO! AUTOMATIC NAMESPACE -->
+          <namespace>/tb2</namespace>
         </ros>
         <output_type>sensor_msgs/LaserScan</output_type>
         <frame_name>laser</frame_name>

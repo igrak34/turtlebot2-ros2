@@ -71,6 +71,8 @@
                 <plugin name="turtlebot2_laserscan" filename="libgazebo_ros_ray_sensor.so">
                     <ros>
                       <remapping>~/out:=scan</remapping>
+                      <!-- TODO! AUTOMATIC NAMESPACE -->
+		              <namespace>/tb2</namespace>        
                     </ros>
                     <output_type>sensor_msgs/LaserScan</output_type>
                     <frame_name>laser</frame_name>

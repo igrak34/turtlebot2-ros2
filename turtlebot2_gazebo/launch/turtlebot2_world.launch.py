@@ -12,7 +12,8 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-
+    namespace = LaunchConfiguration('namespace')
+    use_namespace = LaunchConfiguration('use_namespace')
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
 
     turtlebot2_gazebo_package = FindPackageShare(
@@ -84,6 +85,8 @@ def generate_launch_description():
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
+        namespace=namespace,
+        remappings=remappings,
         parameters=[
             {
                 "robot_description": Command(
@@ -96,39 +99,27 @@ def generate_launch_description():
                     ]
                 )
             },
-            {"use_sim_time": True},
+            {"use_sim_time": use_sim_time},
         ],
-    )
-
-    joint_state_publisher_node = Node(      # ???
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher'
     )
 
     spawn_tb2 = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
         name="spawn_entity",
+        namespace=namespace,
         output="screen",
         arguments=[
             "-entity",
             "turtlebot2",
             "-topic",
-            "/robot_description",
+            # TODO - branie namespace z launch configuration
+            ("/tb2/robot_description"),
             "-x",
             "0",
             "-y",
             "0",
         ],
-    )
-
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        output='screen',
-        parameters=[{'use_sim_time': True}]
     )
 
     # mapping_launch=Node(
@@ -147,12 +138,20 @@ def generate_launch_description():
             'world',
             default_value=[os.path.join(
                 turtlebot2_gazebo_package, 'worlds', 'test2.world'), ''],
-            description='SDF world file')])
+            description='SDF world file'),
+        DeclareLaunchArgument(
+            'namespace',
+            default_value='tb2',
+            description='Top-level namespace'),
+
+        DeclareLaunchArgument(
+            'use_namespace',
+            default_value='true',
+            description='Whether to apply a namespace to the navigation stack'),
+    ])
 
     ld.add_action(gazebo)
     ld.add_action(robot_state_publisher_node)
-    # ld.add_action(joint_state_publisher_node)
     ld.add_action(spawn_tb2)
-    # ld.add_action(rviz_node)
 
     return ld
