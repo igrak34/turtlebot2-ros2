@@ -114,7 +114,7 @@ def generate_launch_description():
             "turtlebot2",
             "-topic",
             # TODO - branie namespace z launch configuration
-            ("/tb2/robot_description"),
+            ("/tb2_5/robot_description"),
             "-x",
             "0",
             "-y",
@@ -139,9 +139,10 @@ def generate_launch_description():
             default_value=[os.path.join(
                 turtlebot2_gazebo_package, 'worlds', 'test2.world'), ''],
             description='SDF world file'),
+
         DeclareLaunchArgument(
             'namespace',
-            default_value='tb2',
+            default_value='tb2_5',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(

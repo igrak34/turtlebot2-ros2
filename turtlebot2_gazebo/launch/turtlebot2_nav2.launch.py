@@ -55,7 +55,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             'namespace',
-            default_value='tb2',
+            default_value='tb2_5',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(
@@ -63,11 +63,11 @@ def generate_launch_description():
             default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
 
-        DeclareLaunchArgument(
+        DeclareLaunchArgument(  # TODO! automatic substitution namespace for proper topics
             'rviz_config',
             default_value=os.path.join(
-                turtlebot2_gazebo_dir, 'rviz', 'namespaced_nav2.rviz'),
-            description='Full path to the RVIZ config file to use'),
+                turtlebot2_gazebo_dir, 'rviz', 'namespaced_tb2_5.rviz'),
+            description='Full path to the RVIZ config file to use'), 
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([turtlebot2_world_launch])
