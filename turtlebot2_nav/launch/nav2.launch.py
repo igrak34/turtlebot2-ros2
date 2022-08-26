@@ -110,7 +110,7 @@ def generate_launch_description():
            executable='urg_node_driver',
            output='screen',
            namespace=namespace,
-           parameters=[{"ip_adress":"192.168.0.10"},{"ip_port":10940},{"serial_baud":115200}],
+           parameters=[{"ip_adress":"192.168.0.10"},{"ip_port":10940},{"serial_baud":115200},{"angle_max":1.56},{"angle_min":-1.56}],
            remappings=[('/tf','tf'),('/tf_static','tf_static'),('/scan','scan')]
         ),
 
