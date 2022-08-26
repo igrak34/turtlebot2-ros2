@@ -65,7 +65,7 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        arguments=['-d',os.path.join(turtlebot2_slam_package,'rviz/mapping.rviz')] # TODO - inny plik rviz 
+        arguments=['-d',os.path.join(turtlebot2_slam_package,'rviz/mapping.rviz')]
     )
     
     mapping_launch = launch.actions.IncludeLaunchDescription(
