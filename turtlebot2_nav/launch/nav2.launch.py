@@ -19,7 +19,7 @@ def generate_launch_description():
         'map',
         default=os.path.join(
             get_package_share_directory('turtlebot2_nav'),
-            'map',
+            'maps',
             'lab07.yaml'
         )
     )

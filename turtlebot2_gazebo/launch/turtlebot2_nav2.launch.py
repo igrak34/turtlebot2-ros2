@@ -1,4 +1,5 @@
 import os
+from unicodedata import name
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -7,7 +8,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from nav2_common.launch import ReplaceString
+from nav2_common.launch import ReplaceString, RewrittenYaml
 
 
 def generate_launch_description():
@@ -24,7 +25,7 @@ def generate_launch_description():
             get_package_share_directory('turtlebot2_gazebo'),
             'config',
             'nav2_params.yaml'))
-    
+
     namespace = LaunchConfiguration('namespace')
     use_namespace = LaunchConfiguration('use_namespace')
     rviz_config_file = LaunchConfiguration('rviz_config')
@@ -36,6 +37,14 @@ def generate_launch_description():
 
     turtlebot2_world_launch = os.path.join(get_package_share_directory(
         'turtlebot2_gazebo'), 'launch', 'turtlebot2_world.launch.py')
+
+    namespaced_params= ReplaceString(
+        source_file=param_dir, replacements={"/namespace":("/",namespace)}
+    )
+
+    namespaced_rviz_config_file = ReplaceString(
+        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace)})
+
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -63,14 +72,17 @@ def generate_launch_description():
             default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
 
-        DeclareLaunchArgument(  # TODO! automatic substitution namespace for proper topics
+        DeclareLaunchArgument(
             'rviz_config',
             default_value=os.path.join(
-                turtlebot2_gazebo_dir, 'rviz', 'namespaced_tb2_5.rviz'),
-            description='Full path to the RVIZ config file to use'), 
+                turtlebot2_gazebo_dir, 'rviz', 'namespaced_nav2.rviz'),
+            description='Full path to the RVIZ config file to use'),
 
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([turtlebot2_world_launch])
+            PythonLaunchDescriptionSource([turtlebot2_world_launch]),
+            launch_arguments={'namespace': namespace,
+                              'use_sim_time': use_sim_time,
+                              'use_namespace': use_namespace}.items()
         ),
 
         IncludeLaunchDescription(
@@ -79,16 +91,16 @@ def generate_launch_description():
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
-                'params_file': param_dir}.items(),
+                'params_file': namespaced_params}.items(),
         ),
 
         Node(
             package='rviz2',
             executable='rviz2',
             namespace=namespace,
-            arguments=['-d', rviz_config_file],
+            arguments=['-d', namespaced_rviz_config_file],
             output='screen',
-            parameters=[{'use_sim_time':use_sim_time}],
+            parameters=[{'use_sim_time': use_sim_time}],
             remappings=[('/tf', 'tf'),
                         ('/tf_static', 'tf_static'),
                         ('/goal_pose', 'goal_pose'),

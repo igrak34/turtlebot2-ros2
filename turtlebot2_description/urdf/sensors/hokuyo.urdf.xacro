@@ -7,7 +7,8 @@
     <xacro:property name="laser_py" value="0" />
     <xacro:property name="laser_pz" value="0.21" />
 
-    <xacro:property name="robot_namespace" value="/tb2_5"/>
+    <xacro:arg name="namespace" default=""/>
+    <xacro:property name="robot_namespace" value="/$(arg namespace)"/>
 
     <xacro:macro name="box_inertia" params="x y z mass">
         <inertia ixx="${0.0833333 * mass * (y*y + z*z)}" ixy="0.0" ixz="0.0" iyy="${0.0833333 * mass * (x*x + z*z)}" iyz="0.0" izz="${0.0833333 * mass * (x*x + y*y)}" />
