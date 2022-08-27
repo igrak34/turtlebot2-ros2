@@ -21,10 +21,13 @@ def generate_launch_description():
     rviz_config_file = LaunchConfiguration('rviz_config')
     turtlebot2_nav_dir = get_package_share_directory('turtlebot2_nav')
 
+    namespaced_rviz_config_file = ReplaceString(
+        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace)})
+    
     return LaunchDescription([
         DeclareLaunchArgument(
             'namespace',
-            default_value='tb2_6',
+            default_value='tb2_5',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(
@@ -32,12 +35,12 @@ def generate_launch_description():
             default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
 
-        DeclareLaunchArgument(  # TODO! automatic substitution namespace for proper topics
+        DeclareLaunchArgument(
             'rviz_config',
             default_value=os.path.join(
                 turtlebot2_nav_dir,
                 'rviz', 
-                'namespaced_tb2_6.rviz'),
+                'namespaced_nav2.rviz'),
             description='Full path to the RVIZ config file to use'),
         
         DeclareLaunchArgument(
@@ -49,7 +52,7 @@ def generate_launch_description():
             package='rviz2',
             executable='rviz2',
             namespace=namespace,
-            arguments=['-d', rviz_config_file],
+            arguments=['-d', namespaced_rviz_config_file],
             output='screen',
             remappings=[('/tf', 'tf'),
                         ('/tf_static', 'tf_static'),
