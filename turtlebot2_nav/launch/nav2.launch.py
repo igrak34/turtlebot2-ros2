@@ -83,11 +83,11 @@ def generate_launch_description():
                 'rviz', 
                 'namespaced_tb2_6.rviz'),
             description='Full path to the RVIZ config file to use'),
-        
+
         DeclareLaunchArgument(
-            'use_namespace',
-            default_value='true',
-            description='Whether to apply a namespace to the navigation stack'),
+            'open_rviz',
+            default_value='false',
+            description='open rviz'),
         
         Node(
             package='kobuki_node',
@@ -123,6 +123,7 @@ def generate_launch_description():
         ),
 
         Node(
+            condition=launch.conditions.IfCondition(launch.substitutions.LaunchConfiguration("open_rviz")),
             package='rviz2',
             executable='rviz2',
             namespace=namespace,
