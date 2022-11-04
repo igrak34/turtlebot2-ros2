@@ -52,7 +52,7 @@ bt_navigator:
     use_sim_time: False
     global_frame: map
     robot_base_frame: base_link
-    odom_topic: /namespace/odom
+    odom_topic: /tb2_6/odom
     default_bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
     bt_loop_duration: 10
     default_server_timeout: 20
@@ -120,9 +120,18 @@ controller_server:
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.25
 
-    # DWB parameters
     FollowPath:
-      plugin: "dwb_core::DWBLocalPlanner"
+      plugin: "nav2_rotation_shim_controller::RotationShimController"
+      angular_dist_threshold: 0.785
+      forward_sampling_distance: 0.5
+      rotate_to_heading_angular_vel: 1.8
+      max_angular_accel: 3.2
+      simulate_ahead_time: 1.0
+      primary_controller: "dwb_core::DWBLocalPlanner"
+
+      # DWB parameters
+      # FollowPath:
+      # plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: True
       min_vel_x: 0.0
       min_vel_y: 0.0
@@ -199,7 +208,7 @@ local_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /namespace/scan
+          topic: /tb2_6/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -215,7 +224,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: scan
         scan:
-          topic: /namespace/scan
+          topic: /tb2_6/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -252,7 +261,7 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /namespace/scan
+          topic: /tb2_6/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -272,7 +281,7 @@ global_costmap:
         mark_threshold: 0
         observation_sources: scan
         scan:
-          topic: /namespace/scan
+          topic: /tb2_6/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -299,7 +308,7 @@ global_costmap:
 map_server:
   ros__parameters:
     use_sim_time: False
-    yaml_filename: "map_1661002108.yaml"
+    yaml_filename: "lab07.yaml"
 
 map_saver:
   ros__parameters:

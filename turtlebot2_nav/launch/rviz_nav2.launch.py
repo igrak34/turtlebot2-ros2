@@ -27,7 +27,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'namespace',
-            default_value='tb2_5',
+            default_value='tb2',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(
