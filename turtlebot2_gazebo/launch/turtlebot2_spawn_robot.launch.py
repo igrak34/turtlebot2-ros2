@@ -16,19 +16,38 @@ from launch.launch_context import LaunchContext
 from launch.actions import OpaqueFunction
 
 
+def robot_state_publisher_launch(context, *args, **kwargs):
+    turtlebot2_description_package = FindPackageShare(
+        package="turtlebot2_description").find("turtlebot2_description")
+    launch_namespace = LaunchConfiguration('namespace').perform(context)
+    urdf = (xacro.process_file(os.path.join(turtlebot2_description_package,
+                                            "robots/kobuki_hexagons_hokuyo.urdf.xacro"),
+                               mappings={'namespace': launch_namespace}))
+    pretty_urdf = urdf.toprettyxml(indent='   ')
+
+    robot_state_publisher_node = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        namespace=LaunchConfiguration('namespace'),
+        remappings=[('/tf', 'tf'),
+                    ('/tf_static', 'tf_static')],
+        parameters=[
+            {"robot_description": pretty_urdf},
+            {"use_sim_time": LaunchConfiguration('use_sim_time')},
+        ],
+    )
+
+    return [robot_state_publisher_node]
+
+
 def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     use_namespace = LaunchConfiguration('use_namespace')
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-
-    turtlebot2_gazebo_package = FindPackageShare(
-        package="turtlebot2_gazebo").find("turtlebot2_gazebo")
+    x_pose = LaunchConfiguration('x_pose')
 
     turtlebot2_description_package = FindPackageShare(
         package="turtlebot2_description").find("turtlebot2_description")
-
-    gazebo_ros_package = FindPackageShare(
-        package="gazebo_ros").find("gazebo_ros")
 
     kobuki_description_package = FindPackageShare(
         package="kobuki_description").find("kobuki_description")
@@ -73,36 +92,11 @@ def generate_launch_description():
         )
     else:
         os.environ["GAZEBO_PLUGIN_PATH"] = install_dir1 + "/lib"
-    # ============================================================
-    gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(gazebo_ros_package, "launch", "gazebo.launch.py"),
-        )
-    )
 
-    spawn_tb2_5 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(turtlebot2_gazebo_package, "launch",
-                         "turtlebot2_spawn_robot.launch.py")
-        ),
-        launch_arguments={'namespace': 'tb2_5'}.items()
-    )
+    print("GAZEBO MODELS PATH==" + str(os.environ["GAZEBO_MODEL_PATH"]))
+    print("GAZEBO PLUGINS PATH==" + str(os.environ["GAZEBO_PLUGIN_PATH"]))
 
-    spawn_tb2_6 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(turtlebot2_gazebo_package, "launch",
-                         "turtlebot2_spawn_robot.launch.py")
-        ),
-        launch_arguments={'namespace': 'tb2_6','x_pose':'2'}.items()
-    )
-
-    ld = LaunchDescription([
-        DeclareLaunchArgument(
-            'world',
-            default_value=[os.path.join(
-                turtlebot2_gazebo_package, 'worlds', 'test2.world'), ''],
-            description='SDF world file'),
-
+    return LaunchDescription([
         DeclareLaunchArgument(
             'namespace',
             default_value='tb2',
@@ -113,9 +107,33 @@ def generate_launch_description():
             default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
 
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='true',
+            description='Whether to use Gazebo clock'),
+        DeclareLaunchArgument(
+            'x_pose',
+            default_value='0',
+            description='x pose of the spawned entity'
+        ),
+
+        OpaqueFunction(function=robot_state_publisher_launch),
+
+        Node(
+            package="gazebo_ros",
+            executable="spawn_entity.py",
+            name="spawn_entity",
+            namespace=namespace,
+            output="screen",
+            arguments=[
+                "-entity",
+                (namespace,"_robot"),
+                "-topic",
+                ("/", namespace, "/robot_description"),
+                "-x",
+                x_pose,
+                "-y",
+                "0",
+            ],
+        )
     ])
-
-    ld.add_action(gazebo)
-    ld.add_action(spawn_tb2_5)
-
-    return ld

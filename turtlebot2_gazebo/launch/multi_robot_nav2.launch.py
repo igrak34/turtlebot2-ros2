@@ -9,8 +9,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from nav2_common.launch import ReplaceString, RewrittenYaml
-from launch.actions import TimerAction
-
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
@@ -26,9 +24,8 @@ def generate_launch_description():
             get_package_share_directory('turtlebot2_gazebo'),
             'config',
             'nav2_params.yaml'))
-    python_commander_dir = get_package_share_directory('nav2_simple_commander')
 
-    namespace = LaunchConfiguration('namespace')
+    namespace1 = LaunchConfiguration('namespace1')
     use_namespace = LaunchConfiguration('use_namespace')
     rviz_config_file = LaunchConfiguration('rviz_config')
 
@@ -37,16 +34,13 @@ def generate_launch_description():
 
     turtlebot2_gazebo_dir = get_package_share_directory('turtlebot2_gazebo')
 
-    turtlebot2_world_launch = os.path.join(get_package_share_directory(
-        'turtlebot2_gazebo'), 'launch', 'turtlebot2_world.launch.py')
-
-    namespaced_params = ReplaceString(
-        source_file=param_dir, replacements={"/namespace": ("/", namespace)}
+    namespaced_params1= ReplaceString(
+        source_file=param_dir, replacements={"/namespace":("/",namespace1)}
     )
 
-    namespaced_rviz_config_file = ReplaceString(
-        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace)})
-
+    namespaced_rviz_config_file1 = ReplaceString(
+        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace1)})
+    
     return LaunchDescription([
         DeclareLaunchArgument(
             'map',
@@ -64,9 +58,14 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'),
 
         DeclareLaunchArgument(
-            'namespace',
-            default_value='tb2',
+            'namespace1',
+            default_value='tb2_5',
             description='Top-level namespace'),
+            
+        DeclareLaunchArgument(
+            'namespace2',
+            default_value='tb2_6',
+            description='top-level namespace for 2nd robot'),
 
         DeclareLaunchArgument(
             'use_namespace',
@@ -107,18 +106,4 @@ def generate_launch_description():
                         ('/goal_pose', 'goal_pose'),
                         ('/clicked_point', 'clicked_point'),
                         ('/initialpose', 'initialpose')]),
-        # TimerAction(period=10.0,
-        #             actions=[
-        #                 Node(
-        #                     package='nav2_simple_commander',
-        #                     executable='example_nav_to_pose',
-        #                     emulate_tty=True,
-        #                     output='screen',
-        #                     namespace=namespace,
-        #                     remappings=[('/tf', 'tf'),
-        #                                 ('/tf_static', 'tf_static'),
-        #                                 ('/goal_pose', 'goal_pose'),
-        #                                 ('/clicked_point', 'clicked_point'),
-        #                                 ('/initialpose', 'initialpose')]
-        #                 )])
     ])
