@@ -44,6 +44,13 @@ def generate_launch_description():
 
     turtlebot2_description_dir = FindPackageShare(package='turtlebot2_description').find('turtlebot2_description')
 
+    namespaced_params= ReplaceString(
+        source_file=param_path, replacements={"/namespace":("/",namespace)}
+    )
+
+    namespaced_rviz_config_file = ReplaceString(
+        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace)})
+
     kobuki_node_dir = get_package_share_directory('kobuki_node')
     params_file = os.path.join(kobuki_node_dir, 'config', 'kobuki_node_params.yaml')
     with open(params_file, 'r') as f:
@@ -68,7 +75,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             'namespace',
-            default_value='tb2_6',
+            default_value='tb2',
             description='Top-level namespace'),
 
         DeclareLaunchArgument(
@@ -81,7 +88,7 @@ def generate_launch_description():
             default_value=os.path.join(
                 turtlebot2_nav_dir, 
                 'rviz', 
-                'namespaced_tb2_6.rviz'),
+                'namespaced_nav2.rviz'),
             description='Full path to the RVIZ config file to use'),
 
         DeclareLaunchArgument(
@@ -119,7 +126,7 @@ def generate_launch_description():
                 [nav2_launch_dir, '/bringup_launch.py']),
             launch_arguments={
                 'map': map_path,
-                'params_file': param_path}.items(),
+                'params_file': namespaced_params}.items(),
         ),
 
         Node(
@@ -127,7 +134,7 @@ def generate_launch_description():
             package='rviz2',
             executable='rviz2',
             namespace=namespace,
-            arguments=['-d', rviz_config_file],
+            arguments=['-d', namespaced_rviz_config_file],
             output='screen',
             remappings=[('/tf', 'tf'),
                         ('/tf_static', 'tf_static'),
