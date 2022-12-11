@@ -85,22 +85,22 @@ def generate_launch_description():
             os.path.join(turtlebot2_gazebo_package, "launch",
                          "turtlebot2_spawn_robot.launch.py")
         ),
-        launch_arguments={'namespace': 'tb2_5'}.items()
+        launch_arguments={'namespace': namespace}.items()
     )
 
-    spawn_tb2_6 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(turtlebot2_gazebo_package, "launch",
-                         "turtlebot2_spawn_robot.launch.py")
-        ),
-        launch_arguments={'namespace': 'tb2_6','x_pose':'2'}.items()
-    )
+    # spawn_tb2_6 = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(turtlebot2_gazebo_package, "launch",
+    #                      "turtlebot2_spawn_robot.launch.py")
+    #     ),
+    #     launch_arguments={'namespace': 'tb2_6','x_pose':'2'}.items()
+    # )
 
     ld = LaunchDescription([
         DeclareLaunchArgument(
             'world',
             default_value=[os.path.join(
-                turtlebot2_gazebo_package, 'worlds', 'test2.world'), ''],
+                turtlebot2_gazebo_package, 'worlds', 'virtual07.world'), ''],
             description='SDF world file'),
 
         DeclareLaunchArgument(

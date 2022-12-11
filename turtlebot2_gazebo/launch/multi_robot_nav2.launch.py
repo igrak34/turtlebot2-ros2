@@ -17,7 +17,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('turtlebot2_gazebo'),
             'maps',
-            'map_1661002108.yaml'))
+            'virtual07.yaml'))
     param_dir = LaunchConfiguration(
         'params_file',
         default=os.path.join(
@@ -26,6 +26,7 @@ def generate_launch_description():
             'nav2_params.yaml'))
 
     namespace1 = LaunchConfiguration('namespace1')
+    namespace2 = LaunchConfiguration('namespace2')
     use_namespace = LaunchConfiguration('use_namespace')
     rviz_config_file = LaunchConfiguration('rviz_config')
 
@@ -40,7 +41,18 @@ def generate_launch_description():
 
     namespaced_rviz_config_file1 = ReplaceString(
         source_file=rviz_config_file, replacements={"/tb2": ("/", namespace1)})
+
+    namespaced_params2= ReplaceString(
+        source_file=param_dir, replacements={"/namespace":("/",namespace2)}
+    )
+
+    namespaced_rviz_config_file2 = ReplaceString(
+        source_file=rviz_config_file, replacements={"/tb2": ("/", namespace2)})
     
+    turtlebot2_world_launch = os.path.join(get_package_share_directory(
+        'turtlebot2_gazebo'), 'launch', 'turtlebot2_world.launch.py')
+    
+    turtlebot2_spawn_robot_launch=os.path.join(get_package_share_directory('turtlebot2_gazebo'),'launch','turtlebot2_spawn_robot.launch.py')
     return LaunchDescription([
         DeclareLaunchArgument(
             'map',
@@ -80,8 +92,16 @@ def generate_launch_description():
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([turtlebot2_world_launch]),
-            launch_arguments={'namespace': namespace,
+            launch_arguments={'namespace': namespace1,
                               'use_sim_time': use_sim_time,
+                              'use_namespace': use_namespace}.items()
+        ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([turtlebot2_spawn_robot_launch]),
+            launch_arguments={'namespace': namespace2,
+                              'use_sim_time': use_sim_time,
+                              'x_pose': '1',
                               'use_namespace': use_namespace}.items()
         ),
 
@@ -91,14 +111,37 @@ def generate_launch_description():
             launch_arguments={
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
-                'params_file': namespaced_params}.items(),
+                'params_file': namespaced_params1,
+                'namespace': namespace1}.items(),
+        ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                [nav2_launch_file_dir, '/bringup_launch.py']),
+            launch_arguments={
+                'map': map_dir,
+                'use_sim_time': use_sim_time,
+                'params_file': namespaced_params2,
+                'namespace': namespace2}.items(),
         ),
 
         Node(
             package='rviz2',
             executable='rviz2',
-            namespace=namespace,
-            arguments=['-d', namespaced_rviz_config_file],
+            namespace=namespace1,
+            arguments=['-d', namespaced_rviz_config_file1],
+            output='screen',
+            parameters=[{'use_sim_time': use_sim_time}],
+            remappings=[('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
+                        ('/goal_pose', 'goal_pose'),
+                        ('/clicked_point', 'clicked_point'),
+                        ('/initialpose', 'initialpose')]),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            namespace=namespace2,
+            arguments=['-d', namespaced_rviz_config_file2],
             output='screen',
             parameters=[{'use_sim_time': use_sim_time}],
             remappings=[('/tf', 'tf'),
