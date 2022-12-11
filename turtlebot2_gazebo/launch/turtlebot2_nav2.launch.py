@@ -19,7 +19,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('turtlebot2_gazebo'),
             'maps',
-            'map_1661002108.yaml'))
+            'virtual07.yaml'))
     param_dir = LaunchConfiguration(
         'params_file',
         default=os.path.join(

@@ -83,7 +83,7 @@ def generate_launch_description():
             default_value='true',
             description='Whether to apply a namespace to the navigation stack'),
 
-        DeclareLaunchArgument(  # TODO! automatic substitution namespace for proper topics
+        DeclareLaunchArgument(
             'rviz_config',
             default_value=os.path.join(
                 turtlebot2_nav_dir, 
