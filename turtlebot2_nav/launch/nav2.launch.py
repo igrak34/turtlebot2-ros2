@@ -34,6 +34,7 @@ def generate_launch_description():
     use_namespace=LaunchConfiguration('use_namespace')
     namespace=LaunchConfiguration('namespace')
     rviz_config_file = LaunchConfiguration('rviz_config')
+    composition_config = LaunchConfiguration('composition', default=False)
 
     nav2_launch_dir = os.path.join(
         get_package_share_directory('nav2_bringup'),
@@ -126,7 +127,8 @@ def generate_launch_description():
                 [nav2_launch_dir, '/bringup_launch.py']),
             launch_arguments={
                 'map': map_path,
-                'params_file': namespaced_params}.items(),
+                'params_file': namespaced_params,
+                'use_composition': composition_config,}.items(),
         ),
 
         Node(
